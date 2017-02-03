@@ -1,8 +1,13 @@
-const spawn     = require('child_process').spawn;
+const exec      = require('child_process').exec;
 const fs        = require('fs');
 const prompt    = require('prompt-sync')();
 const path      = require('path');
 const argv      = require('minimist')(process.argv.slice(2));
+
+const prettyFormat = '%H%n%an%n%ae%n%ad%n%s%n%n';
+const delimiters = ['§', '|', '÷', '¥', 'ƾ'];
+
+var delimiter;
 
 var projectPath;
 var outputFilePath;
@@ -37,15 +42,40 @@ while(!outputFilePath){
 //GETTING THE PROJECT OUTPUT FILE NAME:
 outputFileName = argv.on || prompt('Please enter the project output file name: ');
 
-var log = spawn('git log', {cwd: projectPath});
+//EXECUTING GIT LOG TO DETERMINE DELIMITER
+exec(`git log --reverse --pretty=format:"${prettyFormat}"`,{cwd: projectPath}, determineDelimiter);
 
-log.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-});
+function determineDelimiter(err, stdout, stderr){
+    if(err){
+        console.log(`Error while executing git log on ${projectPath}`);
+        console.log(stderr);
+    }
+    else{
+        let i = 0;
+        while(stdout.indexOf(delimiters[i])!=-1){
+            i++;
+        }
+        if(i==delimiters.length){
+            //ALL DELIMITERS ARE PRESENT IN THE TEXT
+            console.log('Error: no delimiter avaliable');
+            process.exit(1);
+        }
+        delimiter = delimiters[i];
+        exec(`git log --pretty=format:"${prettyFormat}${delimiter}"`,{cwd: projectPath}, processLog);       
+    }
+}
 
-log.stderr.on('data', (data) => {
-    console.log(`stderr: ${data}`);
-});
+function processLog(err, stdout, stderr){
+    let logs = stdout.split(delimiter);
+    let logsObjects = [];
+    let i = 0;
+    while(logs[i]){
+        let logSplit = logs[i].split('\n');
+        logsObjects.push({
+            hash: logsObjects[0];
+        });
+    }
+}
 
 //THIS FUNCTIONS CHECKS IF A PATH POINTS TO A FILE OR FOLDER THAT EXISTS AND IS ACCESSIABLE.
 function checkPath(uncheckedPath){
