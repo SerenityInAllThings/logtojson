@@ -72,7 +72,11 @@ function processLog(err, stdout, stderr){
     while(logs[i]){
         let logSplit = logs[i].split('\n');
         logsObjects.push({
-            hash: logsObjects[0];
+            hash: logsObjects[0],
+            authorName: logsObjects[1],
+            authorEmail: logsObjects[2],
+            date: logsObjects[3],
+            text: 
         });
     }
 }
