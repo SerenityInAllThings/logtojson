@@ -4,7 +4,7 @@ const prompt    = require('prompt-sync')();
 const path      = require('path');
 const argv      = require('minimist')(process.argv.slice(2));
 
-const prettyFormat = '%H%n%an%n%ae%n%ad%n%s';
+const prettyFormat = '%H%n%an%n%ae%n%ad%n%B';
 const delimiters = ['§', '|', '÷', '¥', 'ƾ'];
 
 var delimiter;
@@ -81,7 +81,14 @@ function processLog(err, stdout, stderr){
         });
         i++;
     }
-    console.log(logsObjects)
+    fs.writeFile(path.join(outputFilePath, outputFileName),JSON.stringify(logsObjects, null, 2), 'utf8', (err)=>{
+        if (err){
+            console.log('Error while writing the output file.');
+            console.log(err);
+            process.exit(2);
+        }
+        console.log(`File was saved at ${path.join(outputFilePath, outputFileName)}`);
+    });
 }
 
 //THIS FUNCTION CHECKS IF A PATH POINTS TO A FILE OR FOLDER THAT EXISTS AND IS ACCESSIABLE.
