@@ -4,7 +4,7 @@ const prompt    = require('prompt-sync')();
 const path      = require('path');
 const argv      = require('minimist')(process.argv.slice(2));
 
-const prettyFormat = '%H%n%an%n%ae%n%ad%n%s%n%n';
+const prettyFormat = '%H%n%an%n%ae%n%ad%n%s';
 const delimiters = ['§', '|', '÷', '¥', 'ƾ'];
 
 var delimiter;
@@ -61,27 +61,30 @@ function determineDelimiter(err, stdout, stderr){
             process.exit(1);
         }
         delimiter = delimiters[i];
-        exec(`git log --pretty=format:"${prettyFormat}${delimiter}"`,{cwd: projectPath}, processLog);       
+        exec(`git log --pretty=format:"${delimiter}${prettyFormat}"`,{cwd: projectPath}, processLog);       
     }
 }
 
 function processLog(err, stdout, stderr){
     let logs = stdout.split(delimiter);
     let logsObjects = [];
-    let i = 0;
+    //INDEX STARTS ON 1 BECAUSE THE FIRST ITEM IN THE ARRAY IS ALWAYS EMPTY
+    let i = 1;
     while(logs[i]){
         let logSplit = logs[i].split('\n');
         logsObjects.push({
-            hash: logsObjects[0],
-            authorName: logsObjects[1],
-            authorEmail: logsObjects[2],
-            date: logsObjects[3],
-            text: 
+            hash: logSplit[0],
+            authorName: logSplit[1],
+            authorEmail: logSplit[2],
+            date: logSplit[3],
+            text: logSplit.slice(4,logSplit.length).join('\n')
         });
+        i++;
     }
+    console.log(logsObjects)
 }
 
-//THIS FUNCTIONS CHECKS IF A PATH POINTS TO A FILE OR FOLDER THAT EXISTS AND IS ACCESSIABLE.
+//THIS FUNCTION CHECKS IF A PATH POINTS TO A FILE OR FOLDER THAT EXISTS AND IS ACCESSIABLE.
 function checkPath(uncheckedPath){
     try{
         fs.accessSync(uncheckedPath);
