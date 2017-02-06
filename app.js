@@ -4,7 +4,7 @@ const prompt    = require('prompt-sync')();
 const path      = require('path');
 const argv      = require('minimist')(process.argv.slice(2));
 
-const prettyFormat = '%H%n%an%n%ae%n%ad%n%B';
+const prettyFormat = '%H %n%an %n%ae %n%cI %n%ct %n%B';
 const delimiters = ['§', '|', '÷', '¥', 'ƾ'];
 
 var delimiter;
@@ -77,7 +77,8 @@ function processLog(err, stdout, stderr){
             authorName: logSplit[1],
             authorEmail: logSplit[2],
             date: logSplit[3],
-            text: logSplit.slice(4,logSplit.length).join('\n')
+            dateUNIX: logSplit[4],
+            text: logSplit.slice(5,logSplit.length).join('\n')
         });
         i++;
     }
